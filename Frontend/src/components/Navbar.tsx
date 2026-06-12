@@ -6,7 +6,7 @@ const activeClass = 'text-emerald-600 font-semibold'
 const normalClass = 'text-slate-600 hover:text-slate-900'
 
 export default function Navbar() {
-  const { cart } = useAppContext()
+  const { cart, user, logout } = useAppContext()
   const navigate = useNavigate()
 
   return (
@@ -33,6 +33,29 @@ export default function Navbar() {
           <NavLink to="/contact" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
             Contact
           </NavLink>
+          {user ? (
+            <>
+              <span className="rounded-full bg-slate-100 px-3 py-2 text-slate-700">Hi, {user.name}</span>
+              <button
+                onClick={() => {
+                  logout()
+                  navigate('/')
+                }}
+                className="rounded-full bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-200"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
+                Login
+              </NavLink>
+              <NavLink to="/register" className={({ isActive }) => (isActive ? activeClass : normalClass)}>
+                Register
+              </NavLink>
+            </>
+          )}
         </nav>
       </div>
     </header>

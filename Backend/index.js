@@ -1,3 +1,4 @@
+import 'dotenv/config.js'
 import express from "express"
 import cors from "cors"
 import { connectDB } from "./db.js"
@@ -25,7 +26,7 @@ app.get('/', (req, res) => {
 
 connectDB()
   .then(() => {
-    app.listen(port, '1.1.1.1',() => {
+    app.listen(port,() => {
       console.log(`Backend running at http://localhost:${port}`)
     })
   })

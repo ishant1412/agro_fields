@@ -6,13 +6,14 @@ import {
   updateEnquiry,
   deleteEnquiry,
 } from '../controllers/enquiries.controllers.js'
+import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js'
 
 const router = Router()
 
-router.get('', getEnquiries)
-router.get('/:id', getEnquiryById)
+router.get('', requireAuth, requireAdmin, getEnquiries)
+router.get('/:id', requireAuth, getEnquiryById)
 router.post('/', createEnquiry)
-router.put('/:id', updateEnquiry)
-router.delete('/:id', deleteEnquiry)
+router.put('/:id', requireAuth, requireAdmin, updateEnquiry)
+router.delete('/:id', requireAuth, requireAdmin, deleteEnquiry)
 
 export default router

@@ -4,17 +4,20 @@ import {
   getUserById,
   createUser,
   loginUser,
+  getCurrentUser,
   updateUser,
   deleteUser,
 } from "../controllers/users.controllers.js"
+import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js"
 
 const router = Router()
 
-router.get('', getUsers)
-router.get('/:id', getUserById)
 router.post('/', createUser)
 router.post('/login', loginUser)
-router.put('/:id', updateUser)
-router.delete('/:id', deleteUser)
+router.get('/me', requireAuth, getCurrentUser)
+router.get('', requireAuth, requireAdmin, getUsers)
+router.get('/:id', requireAuth, getUserById)
+router.put('/:id', requireAuth, updateUser)
+router.delete('/:id', requireAuth, requireAdmin, deleteUser)
 
 export default router

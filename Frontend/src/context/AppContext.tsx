@@ -1,5 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { loginUser, registerUser } from '../services/auth.service'
+import { setAuthToken } from '../services/api'
+
+export type User = {
+  _id: string
+  name: string
+  email: string
+  role: 'user' | 'admin'
+}
 
 export type Product = {
   _id: string
@@ -34,6 +43,11 @@ type AppContextType = {
   setCategories: (categories: Category[]) => void
   selectedCategory: string
   setSelectedCategory: (value: string) => void
+  user: User | null
+  token: string | null
+  login: (credentials: { email: string; password: string }) => Promise<void>
+  register: (credentials: { name: string; email: string; password: string }) => Promise<void>
+  logout: () => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -41,6 +55,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined)
 const CART_KEY = 'agricommerce-cart'
 const MODE_KEY = 'agricommerce-mode'
 const CATEGORY_KEY = 'agricommerce-category'
+const AUTH_USER_KEY = 'agricommerce-user'
+const AUTH_TOKEN_KEY = 'agricommerce-token'
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<'b2c' | 'b2b'>(() => {
@@ -55,6 +71,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedCategory, setSelectedCategoryState] = useState<string>(() => {
     return window.localStorage.getItem(CATEGORY_KEY) || ''
   })
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = window.localStorage.getItem(AUTH_USER_KEY)
+    return saved ? JSON.parse(saved) : null
+  })
+  const [token, setToken] = useState<string | null>(() => {
+    return window.localStorage.getItem(AUTH_TOKEN_KEY)
+  })
 
   useEffect(() => {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart))
@@ -67,6 +90,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(CATEGORY_KEY, selectedCategory)
   }, [selectedCategory])
+
+  useEffect(() => {
+    if (user) {
+      window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))
+    } else {
+      window.localStorage.removeItem(AUTH_USER_KEY)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (token) {
+      window.localStorage.setItem(AUTH_TOKEN_KEY, token)
+      setAuthToken(token)
+    } else {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY)
+      setAuthToken(null)
+    }
+  }, [token])
 
   const addToCart = (product: Product) => {
     setCart((current) => {
@@ -108,6 +149,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSelectedCategoryState(value)
   }
 
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    const response = await loginUser({ email, password })
+    setUser(response.user)
+    setToken(response.token)
+  }
+
+  const register = async ({ name, email, password }: { name: string; email: string; password: string }) => {
+    const response = await registerUser({ name, email, password })
+    setUser(response.user)
+    setToken(response.token)
+  }
+
+  const logout = () => {
+    setUser(null)
+    setToken(null)
+  }
+
   const value = useMemo(
     () => ({
       mode,
@@ -121,8 +179,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setCategories,
       selectedCategory,
       setSelectedCategory,
+      user,
+      token,
+      login,
+      register,
+      logout,
     }),
-    [cart, categories, mode, selectedCategory],
+    [cart, categories, mode, selectedCategory, user, token],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
