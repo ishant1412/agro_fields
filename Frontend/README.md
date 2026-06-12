@@ -22,19 +22,30 @@ contact the company
 
 
 use your own credentials in /Backend/.env (if theres no .env create it yourself) for activation of app :
+
+
 JWT_SECRET="create your own secret"
+
 MONGO_URL="at mongo atlas create a cluster and copy the connection string and paste it over here"
 
 
 first seed the database-(to display some data) by executing:
+
+
 node Backend/seed.js
 
 to run backend execute in terminal
+
+
 cd Backend
+
 npm run dev 
 
 to run frontend execute
+
+
 cd Frontend
+
 npm run dev 
 
 
