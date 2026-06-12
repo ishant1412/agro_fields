@@ -4,12 +4,20 @@ Im naming it Agro_fields this is e-commerce platform for agriculture based produ
 app can be switched between both B2B and B2c 
 
 functionalities created
-user registration/login
+
+
+user registration/login:
+
 enuiry page
+
 view products 
+
 add products in cart
+
 execute order 
+
 view past orders
+
 contact the company
 
 
